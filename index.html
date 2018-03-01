@@ -1,0 +1,67 @@
+<html>
+<head>
+<script src='scouting.js'></script>
+<script>
+if('serviceWorker' in navigator) {
+	navigator.serviceWorker.register('./sw.js');
+}
+</script>
+<link rel="stylesheet" type="text/css" href="scouting.css">
+</head>
+<body>
+<div id='screen-events'>
+	<h1>Events</h1>
+	<div id='event-list'></div>
+</div>
+
+<div id='screen-event'>
+	<div>
+		<h1 id='event-label'>Event</h1>
+		<div class='button' onclick='back()'>Back</div>
+	</div>
+	<div class='section'>
+		<div class='section-label'>Teams</div>
+		<div class='section-content' id='event-teams-list'></div>
+	</div>
+	<div class='section'>
+		<div class='section-label'>Matches</div>
+		<div class='section-content' id='event-match-list'></div>
+	</div>
+</div>
+
+<div id='screen-match'>
+	<div>
+		<h1 id='match-label'>Match</h1>
+		<div class='button' onclick='back()'>Back</div>
+		<div class='button' onclick='open_match_in_tba()'>Open in TBA</div>
+	</div>
+	<div id='match_teams'></div>
+</div>
+
+<div id='screen-team'>
+	<div>
+		<h1 id='team-label'>Team</h1>
+		<div class='button' onclick='back()'>Back</div>
+		<div class='button' onclick='open_team_in_tba()'>Open in TBA</div>
+	</div>
+	<div id='team-matches'></div>
+</div>
+
+<div id='screen-enterdata'>
+	<h1 id='enterdata-team-match'>Enter Data</h1>
+	<div id='counters'></div>
+	<textarea id='match-comments' maxlength=200 placeholder="Notes (max 200 chars)"></textarea>
+	<div class='button' onclick='back()'>Back</div>
+	<div class='button' onclick='submit_data()'>Submit</div>
+</div>
+
+<div id='screen-error'>
+	<h1 class='error'>An error has occured.</h1>
+	<div class='button' onclick='open_screen("events")'>Get back to safety</div>
+</div>
+
+<div id='loading'>
+</div>
+
+</body>
+</html>
