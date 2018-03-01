@@ -341,7 +341,7 @@ async function get_match(match_key) {
 	try {
 		return JSON.parse(await get_tba('https://www.thebluealliance.com/api/v3/match/' + match_key));
 	} catch(e) {
-		let event_key = match_key.match(/([0-9]{4}[a-z]+)_/i)[1];
+		let event_key = match_key.match(/([0-9]{4}[a-z0-9]+)_/i)[1];
 		let cached_event = localStorage.getItem("event_" + event_key);
 		if(!cached_event)
 			throw e;
