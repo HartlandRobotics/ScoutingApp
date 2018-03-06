@@ -22,7 +22,10 @@ let comp_levels_play_order = {
 let match_counters = [
 	{name: "Auto Cube Switch", id:"auto_cube_switch"},
 	{name: "Auto Cube Scale", id:"auto_cube_scale"},
+	{name: "Auto Line Cross", id:"auto_line_cross", max: 1},
+	{name: "Switch Attempt", id:"att_cube_switch"},
 	{name: "Tele Cube Switch", id:"tele_cube_switch"},
+	{name: "Scale Attempt", id:"att_cube_scale"},
 	{name: "Tele Cube Scale", id:"tele_cube_scale"},
 	{name: "Climb", id:"climb", max: 1},
 	{name: "Exchange", id:"exchange"}
@@ -235,7 +238,7 @@ async function open_screen(screenname, meta = {}) {
 
 				let adder = document.createElement("div");
 				adder.classList.add("plus");
-				adder.addEventListener("click", ()=>{window.counter_nums[counter.id]++; number.textContent = ""+window.counter_nums[counter.id];});
+				adder.addEventListener("click", ()=>{if(counter.max && window.counter_nums[counter.id] >= counter.max) return; window.counter_nums[counter.id]++; number.textContent = ""+window.counter_nums[counter.id];});
 				elem.appendChild(adder);
 
 				window.counter_nums[counter.id] = 0;
