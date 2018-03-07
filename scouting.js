@@ -196,6 +196,7 @@ async function open_screen(screenname, meta = {}) {
 			document.body.classList.add("loading");
 			let match_list = document.getElementById('team-matches');
 			match_list.innerHTML = "";
+			let match_elems = {};
 			for(let match of (await get_event_meta(window.event_meta.event)).matches) {
 				if(match.alliances && ((match.alliances.red && match.alliances.red.team_keys && match.alliances.red.team_keys.indexOf(meta.team) != -1) || (match.alliances.blue && match.alliances.blue.team_keys && match.alliances.blue.team_keys.indexOf(meta.team) != -1))) {
 					let elem = document.createElement('div');
@@ -205,9 +206,19 @@ async function open_screen(screenname, meta = {}) {
 					elem.addEventListener("click", () => {
 						open_screen("match", {match: match.key, name});
 					});
+					match_elems[match.key] = elem;
 					match_list.appendChild(elem);
 				}
 			}
+			get_jsonp(gscript_url + "?get_scouted=" + encodeURIComponent(window.event_meta.event)).then((scouted_list) => {
+				for(let match of Object.keys(match_elems)) {
+					let elem = match_elems[match];
+					if(!scouted_list[match] || !scouted_list[match].includes(meta.team))
+						elem.classList.add("not-scouted");
+					else
+						elem.classList.add("fully-scouted");
+				}
+			}, (err)=>{console.error(err);});
 			document.getElementById("team-label").textContent = meta.name + " (" + meta.team + ")";
 			document.body.classList.remove("loading");
 		} else if(screenname == 'enterdata') {
