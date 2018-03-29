@@ -28,7 +28,8 @@ let match_counters = [
 	{name: "Scale Attempt", id:"att_cube_scale"},
 	{name: "Tele Cube Scale", id:"tele_cube_scale"},
 	{name: "Climb", id:"climb", max: 1},
-	{name: "Exchange", id:"exchange"}
+	{name: "Exchange", id:"exchange"},
+	{name: "Cube Pickup Rating", id: "cube_pickup", max: 3}
 ];
 
 let data_queue = [];
