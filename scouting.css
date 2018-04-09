@@ -11,6 +11,13 @@ body.loading {
 
 h1 {
 	font-size: 6vh;
+	display: block;
+	text-align: center;
+}
+
+h2 {
+	font-size: 5vh;
+	display: block;
 	text-align: center;
 }
 
@@ -138,6 +145,17 @@ h1 {
 	justify-items: stretch;
 	margin: 5px;
 	overflow: hidden;
+}
+
+.counter.counter-dropdown {
+	grid-template-areas:
+	"label label label"
+	"dropdown dropdown dropdown"
+}
+.counter.counter-dropdown select {
+	grid-area: dropdown;
+	font-size: 25px;
+	text-align-last: center;
 }
 
 .counter .label {

@@ -20,16 +20,29 @@ let comp_levels_play_order = {
 };
 
 let match_counters = [
+	/**/{name: "Autonomous", style: "header"},
 	{name: "Auto Cube Switch", id:"auto_cube_switch"},
 	{name: "Auto Cube Scale", id:"auto_cube_scale"},
 	{name: "Auto Line Cross", id:"auto_line_cross", max: 1},
-	{name: "Switch Attempt", id:"att_cube_switch"},
+
+	/**/{name: "Teleop", style: "header"},
 	{name: "Tele Cube Switch", id:"tele_cube_switch"},
-	{name: "Scale Attempt", id:"att_cube_scale"},
+	{name: "Switch Attempt", id:"att_cube_switch"},
 	{name: "Tele Cube Scale", id:"tele_cube_scale"},
-	{name: "Climb", id:"climb", max: 1},
+	{name: "Scale Attempt", id:"att_cube_scale"},
 	{name: "Exchange", id:"exchange"},
-	{name: "Cube Pickup Rating", id: "cube_pickup", max: 3}
+	{name: "Dropped Cube", id:"cube_drop"},
+
+	/**/{name: "End Game", style: "header"},
+	{name: "Climb", id:"climb", max: 1},
+	{name: "Robot Carry", id:"carry", max: 2},
+	{name: "Ramp w/o Climb", id:"ramp", max: 1},
+
+	/**/{name: "Analysis", style: "header"},
+	{name: "Cube Pickup Rating", id: "cube_pickup", style: "dropdown", options: {"No Attempt": 0, "Poor": 1, "Good": 2, "Excellent": 3}},
+	{name: "Focus", id: "focus", style: "dropdown", options: {"Exchange": "exchange", "Scale": "scale", "Offence Switch": "oswitch", "Defence Switch": "dswitch", "Offence Block": "oblock"}},
+	{name: "Speed", id: "speed", style: "dropdown", options: {"Slow": 0, "Average": 1, "Fast": 2}},
+	{name: "Strategy", id: "strategy", style: "dropdown", options: {"No Strategy": 0, "Poor": 1, "Good": 2, "Excellent": 3}},
 ];
 
 let data_queue = [];
@@ -230,6 +243,12 @@ async function open_screen(screenname, meta = {}) {
 			counters.innerHTML = "";
 			window.counter_nums = {};
 			for(let counter of match_counters) {
+				if(counter.style == "header") {
+					let elem = document.createElement("h2");
+					elem.textContent = counter.name;
+					counters.appendChild(elem);
+					continue;
+				}
 				let elem = document.createElement("div");
 				elem.classList.add("counter");
 
@@ -238,22 +257,42 @@ async function open_screen(screenname, meta = {}) {
 				label.textContent = counter.name;
 				elem.appendChild(label);
 
-				let subtractor = document.createElement("div");
-				subtractor.classList.add("minus");
-				subtractor.addEventListener("click", ()=>{if(window.counter_nums[counter.id] <= 0) return; window.counter_nums[counter.id]--; number.textContent = ""+window.counter_nums[counter.id];});
-				elem.appendChild(subtractor);
+				if(counter.style == "dropdown") {
+					elem.classList.add("counter-dropdown");
+					let select = document.createElement("select");
+					for(let option_name of Object.keys(counter.options)) {
+						let option_value = counter.options[option_name];
+						if(window.counter_nums[counter.id] == undefined)
+							window.counter_nums[counter.id] = option_value;
+						let option = document.createElement("option");
+						option.value = option_value;
+						option.textContent = option_name;
+						select.appendChild(option);
+					}
+					select.addEventListener("change", () => {
+						if(("" + +select.value) === select.value)
+							window.counter_nums[counter.id] = +select.value;
+						else
+							window.counter_nums[counter.id] = select.value;
+					});
+					elem.appendChild(select);
+				} else {
+					let subtractor = document.createElement("div");
+					subtractor.classList.add("minus");
+					subtractor.addEventListener("click", ()=>{if(window.counter_nums[counter.id] <= 0) return; window.counter_nums[counter.id]--; number.textContent = ""+window.counter_nums[counter.id];});
+					elem.appendChild(subtractor);
 
-				let number = document.createElement("div");
-				number.classList.add("number");
-				number.textContent = "0";
-				elem.appendChild(number);
+					let number = document.createElement("div");
+					number.classList.add("number");
+					number.textContent = "0";
+					elem.appendChild(number);
 
-				let adder = document.createElement("div");
-				adder.classList.add("plus");
-				adder.addEventListener("click", ()=>{if(counter.max && window.counter_nums[counter.id] >= counter.max) return; window.counter_nums[counter.id]++; number.textContent = ""+window.counter_nums[counter.id];});
-				elem.appendChild(adder);
-
-				window.counter_nums[counter.id] = 0;
+					let adder = document.createElement("div");
+					adder.classList.add("plus");
+					adder.addEventListener("click", ()=>{if(counter.max && window.counter_nums[counter.id] >= counter.max) return; window.counter_nums[counter.id]++; number.textContent = ""+window.counter_nums[counter.id];});
+					elem.appendChild(adder);
+					window.counter_nums[counter.id] = 0;
+				}
 
 				counters.appendChild(elem);
 			}
