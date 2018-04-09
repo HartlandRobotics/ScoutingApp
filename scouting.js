@@ -40,7 +40,7 @@ let match_counters = [
 
 	/**/{name: "Analysis", style: "header"},
 	{name: "Cube Pickup Rating", id: "cube_pickup", style: "dropdown", options: {"No Attempt": 0, "Poor": 1, "Good": 2, "Excellent": 3}},
-	{name: "Focus", id: "focus", style: "dropdown", options: {"Exchange": "exchange", "Scale": "scale", "Offence Switch": "oswitch", "Defence Switch": "dswitch", "Offence Block": "oblock"}},
+	{name: "Focus", id: "focus", style: "dropdown", options: {"Exchange": "exchange", "Scale": "scale", "Home Switch": "oswitch", "Away Switch": "dswitch", "Home Blocking": "oblock", "Away Blocking": "dblock"}},
 	{name: "Speed", id: "speed", style: "dropdown", options: {"Slow": 0, "Average": 1, "Fast": 2}},
 	{name: "Strategy", id: "strategy", style: "dropdown", options: {"No Strategy": 0, "Poor": 1, "Good": 2, "Excellent": 3}},
 ];
