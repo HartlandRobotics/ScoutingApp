@@ -454,6 +454,7 @@ async function process_queue() {
 	if(data_queue_processing)
 		return false;
 	try {
+		data_queue_processing = true;
 		while(data_queue.length) {
 			let item = data_queue[0];
 			console.log(`Uploading ${item}...`);
@@ -463,7 +464,6 @@ async function process_queue() {
 			data_queue.splice(0, 1);
 			localStorage.setItem("data_queue", JSON.stringify(data_queue));
 		}
-		data_queue_processing = true;
 	} finally {
 		data_queue_processing = false;
 	}
