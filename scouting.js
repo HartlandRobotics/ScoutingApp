@@ -81,6 +81,11 @@ window.addEventListener("load", () => {
 	});
 });
 
+window.addEventListener("beforeunload", () => {
+	if(data_queue_processing)
+		return "The data is still being uploaded!";
+}, false);
+
 window.back = function back() {
 	if(window.curr_screen == "event")
 		open_screen("events");
@@ -443,24 +448,24 @@ window.submit_data = function submit_data() {
 	localStorage.setItem("data_queue", JSON.stringify(data_queue));
 };
 
-let data_queue_processing = {};
+let data_queue_processing = false;
 
-function process_queue() {
-	for(let item of data_queue) {
-		if(data_queue_processing[item])
-			continue;
-		data_queue_processing[item] = true;
-		get_jsonp(item).then(()=>{
+async function process_queue() {
+	if(data_queue_processing)
+		return false;
+	try {
+		while(data_queue.length) {
+			let item = data_queue[0];
+			console.log(`Uploading ${item}...`);
+			await get_jsonp(item);
+			console.log(`Upload of ${item} successful!`);
 			// success!
-			data_queue_processing[item] = false;
-			let idx = data_queue.indexOf(item);
-			if(idx != -1)
-				data_queue.splice(idx, 1);
+			data_queue.splice(0, 1);
 			localStorage.setItem("data_queue", JSON.stringify(data_queue));
-		}, ()=>{
-			// failure!
-			data_queue_processing[item] = false;
-		});
+		}
+		data_queue_processing = true;
+	} finally {
+		data_queue_processing = false;
 	}
 }
 
