@@ -20,29 +20,24 @@ let comp_levels_play_order = {
 };
 
 let match_counters = [
-	/**/{name: "Autonomous", style: "header"},
-	{name: "Auto Cube Switch", id:"auto_cube_switch"},
-	{name: "Auto Cube Scale", id:"auto_cube_scale"},
-	{name: "Auto Line Cross", id:"auto_line_cross", max: 1},
+	{name: "\"\"\"Autonomous\"\"\"", style: "header"}, // gets big air quotes because its not really autonomous anymore
+	{name: "Auto Hatch Panel", id:"auto_hatch", timer: "hatch_cycle"},
+	{name: "Auto Cargo", id: "auto_cargo", timer: "cargo_cycle"},
+	{name: "Auto Movement", id: "auto_movement", style: "dropdown", options: {"No Movement": 0, "Move off HAB 1": 1, "Move off HAB 2": 2}},
 
-	/**/{name: "Teleop", style: "header"},
-	{name: "Tele Cube Switch", id:"tele_cube_switch"},
-	{name: "Switch Attempt", id:"att_cube_switch"},
-	{name: "Tele Cube Scale", id:"tele_cube_scale"},
-	{name: "Scale Attempt", id:"att_cube_scale"},
-	{name: "Exchange", id:"exchange"},
-	{name: "Dropped Cube", id:"cube_drop"},
+	{name: "Teleop", style: "header"},
+	{name: "Hatch -> Ship", id: "hatch_ship", timer: "hatch_cycle"},
+	{name: "Hatch -> Rocket", id: "hatch_rocket", timer: "hatch_cycle"},
+	{name: "Cargo -> Ship", id: "cargo_ship", timer: "cargo_cycle"},
+	{name: "Hatch Missed", id: "hatch_miss"},
+	{name: "Cargo -> Rocket", id: "cargo_rocket", timer: "cargo_cycle"},
+	{name: "Hatch Dropped", id: "hatch_drop"},
+	{name: "Cargo Missed", id: "cargo_miss"},
+	{name: "Cargo Dropped", id: "cargo_drop"},
 
-	/**/{name: "End Game", style: "header"},
-	{name: "Climb", id:"climb", max: 1},
-	{name: "Robot Carry", id:"carry", max: 2},
-	{name: "Ramp w/o Climb", id:"ramp", max: 1},
-
-	/**/{name: "Analysis", style: "header"},
-	{name: "Cube Pickup Rating", id: "cube_pickup", style: "dropdown", options: {"No Attempt": 0, "Poor": 1, "Good": 2, "Excellent": 3}},
-	{name: "Focus", id: "focus", style: "dropdown", options: {"Exchange": "exchange", "Scale": "scale", "Home Switch": "oswitch", "Away Switch": "dswitch", "Home Blocking": "oblock", "Away Blocking": "dblock"}},
-	{name: "Speed", id: "speed", style: "dropdown", options: {"Slow": 0, "Average": 1, "Fast": 2}},
-	{name: "Strategy", id: "strategy", style: "dropdown", options: {"No Strategy": 0, "Poor": 1, "Good": 2, "Excellent": 3}},
+	{name: "Endgame", style: "header"},
+	{name: "Hab Zone", id: "hab_zone", style: "dropdown", options: {"HAB Zone 1": 1, "HAB Zone 2": 2, "HAB Zone 3": 3}},
+	{name: "Hab Zone Assistance", id: "hab_zone_assist"}
 ];
 
 let data_queue = [];
@@ -247,6 +242,7 @@ async function open_screen(screenname, meta = {}) {
 			let counters = document.getElementById('counters');
 			counters.innerHTML = "";
 			window.counter_nums = {};
+			window.counter_timers = {};
 			for(let counter of match_counters) {
 				if(counter.style == "header") {
 					let elem = document.createElement("h2");
@@ -284,7 +280,13 @@ async function open_screen(screenname, meta = {}) {
 				} else {
 					let subtractor = document.createElement("div");
 					subtractor.classList.add("minus");
-					subtractor.addEventListener("click", ()=>{if(window.counter_nums[counter.id] <= 0) return; window.counter_nums[counter.id]--; number.textContent = ""+window.counter_nums[counter.id];});
+					subtractor.addEventListener("click", ()=>{
+						if(window.counter_nums[counter.id] <= 0)
+							return;
+						window.counter_nums[counter.id]--;
+						number.textContent = ""+window.counter_nums[counter.id];
+						window.counter_timers[counter.id].length = window.counter_nums[counter.id];
+					});
 					elem.appendChild(subtractor);
 
 					let number = document.createElement("div");
@@ -294,9 +296,17 @@ async function open_screen(screenname, meta = {}) {
 
 					let adder = document.createElement("div");
 					adder.classList.add("plus");
-					adder.addEventListener("click", ()=>{if(counter.max && window.counter_nums[counter.id] >= counter.max) return; window.counter_nums[counter.id]++; number.textContent = ""+window.counter_nums[counter.id];});
+					adder.addEventListener("click", ()=>{
+						if(counter.max && window.counter_nums[counter.id] >= counter.max)
+							return;
+						window.counter_nums[counter.id]++;
+						number.textContent = ""+window.counter_nums[counter.id];
+						window.counter_timers[counter.id].length = window.counter_nums[counter.id];
+						window.counter_timers[counter.id][window.counter_nums[counter.id]-1] = performance.now();
+					});
 					elem.appendChild(adder);
 					window.counter_nums[counter.id] = 0;
+					window.counter_timers[counter.id] = [];
 				}
 
 				counters.appendChild(elem);
@@ -437,6 +447,29 @@ window.submit_data = function submit_data() {
 	};
 	for(let key of Object.keys(window.counter_nums)) {
 		obj["counter-" + key] = window.counter_nums[key];
+	}
+	let timers = {};
+	for(let meta of match_counters) {
+		if(meta.style)
+			continue;
+		let key = meta.id;
+		if(meta.timer) {
+			timers[meta.timer] = timers[meta.timer] || [];
+			if(window.counter_timers[key])
+				for(let time of window.counter_timers[key])
+					timers[meta.timer].push(time);
+		}
+	}
+	for(let key of Object.keys(timers)) {
+		let timer = timers[key];
+		timer.sort((a,b) => {return a-b;});
+		let min_cycle = Infinity;
+		for(let i = 0; i < timer.length-1; i++) {
+			let this_cycle = timer[i+1] - timer[i];
+			if(this_cycle > 3000)
+				min_cycle = Math.min(min_cycle, this_cycle);
+		}
+		obj["counter-" + key] = min_cycle;
 	}
 	for(let key of Object.keys(obj)) {
 		url += "&" + key + "=" + encodeURIComponent(obj[key]);
