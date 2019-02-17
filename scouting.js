@@ -1,6 +1,6 @@
 'use strict';
 
-let year = '2018';
+let year = '2019';
 let gscript_url = "https://script.google.com/macros/s/AKfycbw4RJ--QeKM905q6nn3zdeyJMCDh2L5vk0iHdQTxJVE8ecyHkcS/exec";
 let ping_url = "https://script.google.com/macros/s/AKfycbwah-w_l3x1cfFUaljyUcwaif2Ks1aCl0AvM6p0ZdQIUZVDKfk/exec";
 
