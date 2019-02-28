@@ -508,16 +508,26 @@ function get_jsonp(url) {
 		jsonp_counter++;
 		let funcname = "jsonp_callback_" + jsonp_counter;
 		let script_elem = document.createElement("script");
+		let done = false;
 		window[funcname] = (result) => {
 			delete window[funcname];
 			document.head.removeChild(script_elem);
+			done = true;
 			resolve(result);
 		};
 		script_elem.src = url + (url.indexOf("?") == -1 ? "?" : "&") + "callback=" + funcname;
 		script_elem.addEventListener("error", () => {
 			delete window[funcname];
 			document.head.removeChild(script_elem);
+			done = true;
 			reject(new Error("JSONP request to " + url + " failed"));
+		});
+		script_elem.addEventListener("load", () => {
+			setTimeout(() => {
+				if(!done) {
+					reject(new Error(`JSONP request blocked by CORB`));
+				}
+			}, 300);
 		});
 		document.head.appendChild(script_elem);
 	});
