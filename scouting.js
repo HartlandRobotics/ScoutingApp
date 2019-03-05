@@ -36,7 +36,7 @@ let match_counters = [
 	{name: "Cargo Dropped", id: "cargo_drop"},
 
 	{name: "Endgame", style: "header"},
-	{name: "Hab Zone", id: "hab_zone", style: "dropdown", options: {"HAB Zone 1": 1, "HAB Zone 2": 2, "HAB Zone 3": 3}},
+	{name: "Hab Zone", id: "hab_zone", style: "dropdown", options: {"No HAB": 0, "HAB Zone 1": 1, "HAB Zone 2": 2, "HAB Zone 3": 3}},
 	{name: "Hab Zone Assistance", id: "hab_zone_assist"}
 ];
 
