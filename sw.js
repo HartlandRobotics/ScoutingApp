@@ -1,6 +1,6 @@
 'use strict';
 
-let version = 12;
+let version = 13
 
 self.addEventListener('install', (e) => {
 	e.waitUntil(
