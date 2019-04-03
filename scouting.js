@@ -37,7 +37,8 @@ let match_counters = [
 
 	{name: "Endgame", style: "header"},
 	{name: "Hab Zone", id: "hab_zone", style: "dropdown", options: {"No HAB": 0, "HAB Zone 1": 1, "HAB Zone 2": 2, "HAB Zone 3": 3}},
-	{name: "Hab Zone Assistance", id: "hab_zone_assist"}
+	{name: "Hab Zone Assistance", id: "hab_zone_assist"},
+	{name: "Defense", id: "defense", style: "dropdown", options: {3: "Stellar", 2: "Mediocre", 1: "Bad", 0: "None"}}
 ];
 
 let data_queue = [];
